@@ -1,5 +1,6 @@
 __pycache__/
 data/raw/*
+code/*.ipynb
 
 ###############################################################
 ## The .gitignore file specifies things that git should ignore. 
