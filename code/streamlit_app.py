@@ -25,3 +25,19 @@ line_plot
 #                          line=dict(color=colors[i], width=line_size[i]),
 #                          connectgaps=True,
 #                          ))
+
+def plot_corr_xx(corr_xx):
+    corr_xx.columns = corr_xx.columns.astype(float)
+    fig = px.imshow(
+        corr_xx.iloc[0::5, 0::5], 
+        color_continuous_scale='YlOrRd', 
+        labels={'x': "Wavenumber, cm⁻¹"})
+    fig.update_layout(
+        xaxis={'side': 'top'}, 
+        yaxis={'side': 'left'}
+        )
+    return fig
+
+corr_xx = pd.read_csv("data/corr/XX_dist.csv", index_col=0)
+corr_xx_plot = plot_corr_xx(corr_xx)
+corr_xx_plot
