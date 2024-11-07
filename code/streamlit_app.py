@@ -3,8 +3,26 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+
+Txx = st.slider(
+    label="Txx threshold value", 
+    min_value=0.90, 
+    max_value=1.00, 
+    value=0.95,
+    step=0.005,
+    format="%f"
+    )
+Txy = st.slider(
+    label="Txy threshold value", 
+    min_value=0.0, 
+    max_value=0.3, 
+    value=0.0,
+    step=0.05,
+    format="%f"
+    )
+
 df = pd.read_csv("data/parsed/described.csv", index_col=0)
-masks = pd.read_csv("data/masks/95_00_masks.csv", index_col=0)
+masks = pd.read_csv(f"data/masks/{str(Txx)[2:]}_00_masks.csv", index_col=0)
 
 def plot_masked_spectrum(df, masks):
     one_line = df.T.reset_index()
