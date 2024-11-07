@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 df = pd.read_csv("data/parsed/described.csv", index_col=0)
 masks = pd.read_csv("data/masks/95_00_masks.csv", index_col=0)
@@ -8,16 +9,58 @@ masks = pd.read_csv("data/masks/95_00_masks.csv", index_col=0)
 def plot_masked_spectrum(df, masks):
     one_line = df.T.reset_index()
     one_line["index"] = one_line["index"].astype(float)
+    x = one_line['index'].tolist()
+    min = one_line['min'].tolist()
+    per5 = one_line["5%"].tolist()
+    mid = one_line['50%'].tolist()
+    per95 = one_line["95%"].tolist()
+    max = one_line['max'].tolist()
 
     mask = masks["Cu"]
     masked = one_line[mask.values!=0]
 
-    line_plot = px.line(one_line, x="index", y=["min", "50%", "max"], color_discrete_sequence=["green", "blue", "orange"])
-    scatter_plot = px.scatter(masked, x='index', y='50%', title='Scatter Plot', color_discrete_sequence=['red'], width=100)
-    line_plot.add_trace(scatter_plot.data[0])
-    return line_plot
-line_plot = plot_masked_spectrum(df, masks)
-line_plot
+    x_masked = masked["index"].tolist()
+    mid_masked = masked["50%"].tolist()
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=x + x[::-1],
+            y=min + max[::-1],
+            fill='toself',
+            fillcolor='rgba(67,145,255,0.25)',
+            line_color='rgba(67,145,255,0.3)',
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=x + x[::-1],
+            y=per5 + per95[::-1],
+            fill='toself',
+            fillcolor='rgba(67,145,255,0.45)',
+            line_color='rgba(67,145,255,0.5)',
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=x + x[::-1],
+            y=mid + mid[::-1],
+            line_color='rgba(0,63,152,1)',
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=x_masked,
+            y=mid_masked,
+            mode='markers',
+            marker_color='black',
+        )
+    )
+    return fig
+
+masked_spectrum = plot_masked_spectrum(df, masks)
+masked_spectrum
 
 # TODO use fig = go.Figure() instead
 # fig.add_trace(go.Scatter(x=x_data[i], y=y_data[i], mode='lines',
