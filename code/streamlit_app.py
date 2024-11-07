@@ -30,6 +30,7 @@ def plot_masked_spectrum(df, masks):
             fill='toself',
             fillcolor='rgba(67,145,255,0.25)',
             line_color='rgba(67,145,255,0.3)',
+            name='Min, Max'
         )
     )
     fig.add_trace(
@@ -38,7 +39,8 @@ def plot_masked_spectrum(df, masks):
             y=per5 + per95[::-1],
             fill='toself',
             fillcolor='rgba(67,145,255,0.45)',
-            line_color='rgba(67,145,255,0.5)',
+            line_color='rgba(67,145,255,0.45)',
+            name='5%, 95% percentiles'
         )
     )
 
@@ -47,6 +49,7 @@ def plot_masked_spectrum(df, masks):
             x=x + x[::-1],
             y=mid + mid[::-1],
             line_color='rgba(0,63,152,1)',
+            name='Median'
         )
     )
     fig.add_trace(
@@ -55,7 +58,13 @@ def plot_masked_spectrum(df, masks):
             y=mid_masked,
             mode='markers',
             marker_color='black',
+            name='Selected channels'
         )
+    )
+    fig.update_layout(
+        title="Infared spectrum, selected channels",
+        xaxis_title="Wavenumber, cm⁻¹",
+        yaxis_title="Absorption"
     )
     return fig
 
