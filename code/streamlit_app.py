@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 Txx = st.slider(
     label="Txx threshold value", 
     min_value=0.90, 
-    max_value=1.00, 
+    max_value=0.995, 
     value=0.95,
     step=0.005,
     format="%f"
@@ -15,14 +15,16 @@ Txx = st.slider(
 Txy = st.slider(
     label="Txy threshold value", 
     min_value=0.0, 
-    max_value=0.3, 
+    max_value=0.25, 
     value=0.0,
     step=0.05,
     format="%f"
     )
 
 df = pd.read_csv("data/parsed/described.csv", index_col=0)
-masks = pd.read_csv(f"data/masks/{str(Txx)[2:]}_00_masks.csv", index_col=0)
+masks = pd.read_csv("data/masks/masks.csv", index_col=0)
+mask = masks.loc[(masks["Element"] == "Cu") & (masks["T_xx"] == Txx) & (masks["T_xy"] == Txy)]
+mask = mask.iloc[:, 4:].values[0]
 
 def plot_masked_spectrum(df, masks):
     one_line = df.T.reset_index()
@@ -34,8 +36,8 @@ def plot_masked_spectrum(df, masks):
     per95 = one_line["95%"].tolist()
     max = one_line['max'].tolist()
 
-    mask = masks["Cu"]
-    masked = one_line[mask.values!=0]
+    # mask = masks["Cu"]
+    masked = one_line[mask!=0]
 
     x_masked = masked["index"].tolist()
     mid_masked = masked["50%"].tolist()
@@ -87,7 +89,7 @@ def plot_masked_spectrum(df, masks):
     return fig
 
 masked_spectrum = plot_masked_spectrum(df, masks)
-masked_spectrum
+st.plotly_chart(masked_spectrum, use_container_width=True)
 
 # TODO use fig = go.Figure() instead
 # fig.add_trace(go.Scatter(x=x_data[i], y=y_data[i], mode='lines',
@@ -110,4 +112,4 @@ def plot_corr_xx(corr_xx):
 
 corr_xx = pd.read_csv("data/corr/XX_dist.csv", index_col=0)
 corr_xx_plot = plot_corr_xx(corr_xx)
-corr_xx_plot
+st.plotly_chart(corr_xx_plot, use_container_width=True)
