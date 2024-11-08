@@ -3,6 +3,13 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+df = pd.read_csv("data/parsed/described.csv", index_col=0)
+masks = pd.read_csv("data/masks/masks.csv", index_col=0)
+
+element = st.selectbox(
+    label="Select ion",
+    options=masks["Element"].unique()
+    )
 
 Txx = st.slider(
     label="Txx threshold value", 
@@ -21,12 +28,10 @@ Txy = st.slider(
     format="%f"
     )
 
-df = pd.read_csv("data/parsed/described.csv", index_col=0)
-masks = pd.read_csv("data/masks/masks.csv", index_col=0)
-mask = masks.loc[(masks["Element"] == "Cu") & (masks["T_xx"] == Txx) & (masks["T_xy"] == Txy)]
+mask = masks.loc[(masks["Element"] == element) & (masks["T_xx"] == Txx) & (masks["T_xy"] == Txy)]
 mask = mask.iloc[:, 4:].values[0]
 
-def plot_masked_spectrum(df, masks):
+def plot_masked_spectrum(df, mask):
     one_line = df.T.reset_index()
     one_line["index"] = one_line["index"].astype(float)
     x = one_line['index'].tolist()
@@ -36,7 +41,6 @@ def plot_masked_spectrum(df, masks):
     per95 = one_line["95%"].tolist()
     max = one_line['max'].tolist()
 
-    # mask = masks["Cu"]
     masked = one_line[mask!=0]
 
     x_masked = masked["index"].tolist()
@@ -88,7 +92,7 @@ def plot_masked_spectrum(df, masks):
     )
     return fig
 
-masked_spectrum = plot_masked_spectrum(df, masks)
+masked_spectrum = plot_masked_spectrum(df, mask)
 st.plotly_chart(masked_spectrum, use_container_width=True)
 
 # TODO use fig = go.Figure() instead
